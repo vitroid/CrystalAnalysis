@@ -4,3 +4,19 @@ bin_from_Freezing_Pressure/*
 Freezing_IceVII
 
 *.pyc
+
+bin/slide-and-match
+
+bin/slide-and-match2
+
+@
+
+*.mod
+
+*.o
+
+src/SlideAndOverlay/slide-and-match
+
+src/SlideAndOverlay/slide-and-match2
+
+*.png

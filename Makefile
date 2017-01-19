@@ -1,7 +1,9 @@
 BIN=bin
+all:
+	cd src && make all
 #途中の5 nmスライスだけを切り出す。
 %.nx4a: %.gro
-	$(BIN)/gro2ar3a.py < $< > $@
+	$(BIN)/gro2nx4a.py < $< > $@
 #Visualize the HB
 %.yap: %.nx4a
 	cat $(BIN)/TIP4P.id08 $(BIN)/DEFR $< | $(BIN)/trajConverter.py -y 2.5 > $@
@@ -44,3 +46,48 @@ BIN=bin
 	 awk '{print $$1}' |\
 	 sort -n |\
 	 uniq -c > $@
+
+
+#テンプレートマッチングによる、単位胞の推定
+#とりあえず基準はどこでもいいので、中心付近にある14配位の分子を1つ選ぶ。
+#10001番分子(てきとう)
+#その座標は101.032222222 2.30388888889 120.262222222
+#半径8Å以内の分子だけを抽出する。(60分子程度を含む)
+%.A.ar3a: %.ar3a
+#	python $(BIN)/maketemplate.py 8.0 -101.032222222 -2.30388888889 -120.262222222 < $< > $@
+	python $(BIN)/maketemplate2.py 8.0 10001  < $< > $@
+#B： 10004番目の分子、12配位
+%.B.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10004  < $< > $@
+#C： 10017番目の分子、12配位
+%.C.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10017  < $< > $@
+#D： 10026番目の分子、12配位
+%.D.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10026  < $< > $@
+#E： 10005番目の分子、14配位
+%.E.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10005  < $< > $@
+#F： 10007番目の分子、14配位
+%.F.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10007  < $< > $@
+#template Aを使って、すべての分子に対してマッチングを行う。
+#出力内容は、分子番号、位置、マッチングスコア(変位の二乗和)
+#スコアが一番良いのはA。
+%.A.match2: %.A.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+%.B.match2: %.B.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+%.C.match2: %.C.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+%.D.match2: %.D.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+%.E.match2: %.E.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+%.F.match2: %.F.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+#良くmatchした分子の位置に○を表示
+%.match2.thres50.yap: %.match2
+	awk 'BEGIN{print "@ 3"}($$5<50){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
+%.match2.visualize:
+	make $*.A.match2.thres50.yap $*.B.match2.thres50.yap $*.C.match2.thres50.yap $*.D.match2.thres50.yap $*.E.match2.thres50.yap $*.F.match2.thres50.yap
