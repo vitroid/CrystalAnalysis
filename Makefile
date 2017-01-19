@@ -28,3 +28,19 @@ BIN=bin
 #四面体の隣接関係の作る多角形を可視化する。
 %.adj.rngs.yap: %.ar3a %.adj.rngs
 	cat $^ | python $(BIN)/ar3a+rngs2yap.py > $@
+#配位数の分布。
+%.coord.hist:%.ngph
+#先頭の2行を飛ばし、最後の負の数字(terminator)も飛ばし、
+#結合元と結合先を別の行に展開し、
+#数値としてソートし
+#出現数を数えると、それぞれの原子の配位数が得られる
+#これの配位数のカラムだけを取り出し
+#数値としてソートし
+#出現数を数えると、配位数のヒストグラムになる。
+	tail +3 $< | grep -v '^-' |\
+	 awk '{print$$1;print $$2}' |\
+	 sort -n |\
+	 uniq -c |\
+	 awk '{print $$1}' |\
+	 sort -n |\
+	 uniq -c > $@
