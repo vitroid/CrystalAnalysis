@@ -1,12 +1,22 @@
 BIN=bin
 all:
 	cd src && make all
-#途中の5 nmスライスだけを切り出す。
+
+%.analysis1:
+	make -k -j 8 $*.nx4a $*.ar3a $*.yap $*.pack38.ngph \
+	$*.pack38.tetra.frag $*.pack38.tetra.ar3a \
+	$*.pack38.tetra.adj.ngph $*.pack38.tetra.adj.rngs \
+	$*.pack38.tetra.adj.rngs.yap $*.pack38.coord.hist
+
+
+#途中の5 nmスライスだけを切り出す。ここだけはCで書いたほうがよさそう。
 %.nx4a: %.gro
 	$(BIN)/gro2nx4a.py < $< > $@
 #Visualize the HB
 %.yap: %.nx4a
 	cat $(BIN)/TIP4P.id08 $(BIN)/DEFR $< | $(BIN)/trajConverter.py -y 2.5 > $@
+
+
 
 #ここから先は重心のみを利用
 #ラベルを付け替えて、四元数を無視する
