@@ -23,3 +23,5 @@ src/SlideAndOverlay/slide-and-match2
 *.png
 
 bin/contour
+
+src/Contour/contour
