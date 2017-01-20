@@ -62,6 +62,17 @@ all:
 
 
 #テンプレートマッチングによる、単位胞の推定
+#一応定型的な手順を%.analysis2に示すが、どの分子を基準に、
+#どこまでマッチングするか(並進だけか、回転や鏡映を含めるか)は、
+#試行錯誤で決めざるをえない。(完全に自動化できる手順が発見できればそうするが)
+%.analysis2:
+	for x in A B C D E F; do echo $*.$$x.ar3a; done | xargs make -j 8 -k
+	for x in A B C D E F; do echo $*.$$x.match2; done | xargs make -j 8 -k
+	for x in A B C D E F; do echo $*.$$x.match2.thres30.yap; done | xargs make -j 8 -k
+	for x in A B C D E F; do echo $*.$$x.match2.thres50.yap; done | xargs make -j 8 -k
+
+
+
 #とりあえず基準はどこでもいいので、中心付近にある14配位の分子を1つ選ぶ。
 #10001番分子(てきとう)
 #その座標は101.032222222 2.30388888889 120.262222222
@@ -104,5 +115,3 @@ all:
 	awk 'BEGIN{print "@ 3"}($$5<50){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
 %.match2.thres30.yap: %.match2
 	awk 'BEGIN{print "@ 3"}($$5<30){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
-%.match2.visualize:
-	make $*.A.match2.thres50.yap $*.B.match2.thres50.yap $*.C.match2.thres50.yap $*.D.match2.thres50.yap $*.E.match2.thres50.yap $*.F.match2.thres50.yap
