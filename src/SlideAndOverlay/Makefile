@@ -1,6 +1,6 @@
 #Original codes are in /Volumes/Pogoshare/Shared/src/SlideAndOverlay
 FC=gfortran
-TARGETS=slide-and-match2
+TARGETS=slide-and-match2 slide-and-match
 BINDIR=../../bin
 all: $(TARGETS)
 install: all

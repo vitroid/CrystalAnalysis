@@ -80,6 +80,13 @@ all:
 %.A.ar3a: %.ar3a
 #	python $(BIN)/maketemplate.py 8.0 -101.032222222 -2.30388888889 -120.262222222 < $< > $@
 	python $(BIN)/maketemplate2.py 8.0 10001  < $< > $@
+#軸方向に鏡映したテンプレートを作る．
+%.Ax.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10001 m 1 0 0 < $< > $@
+%.Ay.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10001 m 0 1 0 < $< > $@
+%.Az.ar3a: %.ar3a
+	python $(BIN)/maketemplate2.py 8.0 10001 m 0 0 1 < $< > $@
 #B： 10004番目の分子、12配位
 %.B.ar3a: %.ar3a
 	python $(BIN)/maketemplate2.py 8.0 10004  < $< > $@
@@ -100,6 +107,10 @@ all:
 #スコアが一番良いのはA。
 %.A.match2: %.A.ar3a %.ar3a
 	$(BIN)/slide-and-match2 $^ > $@
+%.Ax.match: %.Ax.ar3a %.ar3a
+	$(BIN)/slide-and-match 10000 $^ > $@
+%.Ax.match2: %.Ax.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
 %.B.match2: %.B.ar3a %.ar3a
 	$(BIN)/slide-and-match2 $^ > $@
 %.C.match2: %.C.ar3a %.ar3a
@@ -113,5 +124,7 @@ all:
 #良くmatchした分子の位置に○を表示
 %.match2.thres50.yap: %.match2
 	awk 'BEGIN{print "@ 3"}($$5<50){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
+%.match.thres50.yap: %.match
+	awk 'BEGIN{print "@ 3"}($$4<50){r=30./$$4;if(r>3)r=3;print "r",r;print "c",-$$1,-$$2,-$$3}' $<  > $@
 %.match2.thres30.yap: %.match2
 	awk 'BEGIN{print "@ 3"}($$5<30){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
