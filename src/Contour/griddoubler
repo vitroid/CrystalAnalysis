@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+sub comp1{
+    local(@grid)=@_;
+    for($iy=1;$iy<$y;$iy+=2){
+	for($iz=0;$iz<$z;$iz+=2){
+	    $grid[$iy*$z+$iz]=
+		($grid[($iy-1)*$z+$iz]+
+		 $grid[($iy+1)*$z+$iz])/2;
+	}
+    }
+    for($iy=0;$iy<$y;$iy++){
+	for($iz=1;$iz<$z;$iz+=2){
+	    $grid[$iy*$z+$iz]=
+		($grid[$iy*$z+($iz-1)]+
+		 $grid[$iy*$z+($iz+1)])/2;
+	}
+    }
+    @grid;
+}
+
+while(<STDIN>){
+    if(/\@GRID/){
+        print $_;
+        $_=<STDIN>;
+	chop;
+        ($x,$y,$z)=split;
+	$x=$x*2;
+	$y=$y*2;
+	$z=$z*2;
+        printf "%d %d %d\n",$x-1,$y-1,$z-1;
+#できるだけメモリを使用しないように、2レイヤだけを配列に確保する。
+#最初のレイヤのよみこみ
+	for($iy=0;$iy<$y;$iy+=2){
+	    for($iz=0;$iz<$z;$iz+=2){
+		$_=<STDIN>;
+		chomp;
+		$grid[$iy*$z+$iz]=$_;
+	    }
+	}
+#最初のレイヤの補間
+	@grid=comp1(@grid);
+#最初のレイヤの出力
+	for($iy=0;$iy<$y-1;$iy++){
+	    for($iz=0;$iz<$z-1;$iz++){
+		print $grid[$iy*$z+$iz]."\n";
+	    }
+	}
+	for($ix=2;$ix<$x;$ix+=2){
+#次のレイヤのよみこみ
+	    for($iy=0;$iy<$y;$iy+=2){
+		for($iz=0;$iz<$z;$iz+=2){
+		    $_=<STDIN>;
+		    chomp;
+		    $next[$iy*$z+$iz]=$_;
+		}
+	    }
+#次のレイヤの補間
+	    @next=comp1(@next);
+#中間レイヤの生成
+	    for($iy=0;$iy<$y-1;$iy++){
+		for($iz=0;$iz<$z-1;$iz++){
+		    $k=$iy*$z+$iz;
+		    $v=($grid[$k]+$next[$k])/2.0;
+		    print "$v\n";
+		}
+	    }
+	    @grid=@next;
+	    for($iy=0;$iy<$y-1;$iy++){
+		for($iz=0;$iz<$z-1;$iz++){
+		    print $grid[$iy*$z+$iz]."\n";
+		}
+	    }
+	}
+    }else{
+	print $_;
+    }
+}

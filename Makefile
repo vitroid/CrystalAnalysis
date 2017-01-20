@@ -15,6 +15,9 @@ all:
 #Visualize the HB
 %.yap: %.nx4a
 	cat $(BIN)/TIP4P.id08 $(BIN)/DEFR $< | $(BIN)/trajConverter.py -y 2.5 > $@
+#OH距離を基準に水素結合ネットワークを定める。
+%.ngph: %.nx4a
+	cat $(BIN)/TIP4P.id08 $(BIN)/DEFR $< | $(BIN)/trajConverter.py -n 2.5 > $@
 
 
 
@@ -99,5 +102,44 @@ all:
 #良くmatchした分子の位置に○を表示
 %.match2.thres50.yap: %.match2
 	awk 'BEGIN{print "@ 3"}($$5<50){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
+%.match2.thres30.yap: %.match2
+	awk 'BEGIN{print "@ 3"}($$5<30){r=30./$$5;if(r>3)r=3;print "r",r;print "c",$$2,$$3,$$4}' $<  > $@
 %.match2.visualize:
 	make $*.A.match2.thres50.yap $*.B.match2.thres50.yap $*.C.match2.thres50.yap $*.D.match2.thres50.yap $*.E.match2.thres50.yap $*.F.match2.thres50.yap
+
+#単位胞は、上のyaplotの出力から手作業で推定する。
+#推定した単位胞の基本ベクトルは、
+#a=(9.39,-9.39,0)
+#b=(9.39,+9.39,0)
+#c=(0, 0, 7.38)
+#これを使って、平均的な分子配置を得る。
+#match2ファイルのなかで、特にerrorが小さい配置だけを選び、マッチした分子配置を
+#原点をずらしてすべて重ねあわせる。
+#Yaplotでまず重ねた図を確認
+#重なりが多すぎてまったく読めない。
+%.unit.yap: %.ar3a %.ngph %.A.match2
+	cat $*.ar3a $*.ngph | $(BIN)/slide-and-overlay2.py $*.A.match2 9.39 -9.39 0 9.39 9.39 0 0 0 7.38 > $@
+#原点をずらしたあとの、セル内の相対座標を出力。
+#これを見ると、単位胞の中の分子数は70〜80ぐらいの幅があるようだ。
+#しかし、平均的な分布をみれば、どこが欠陥かはわかるはず。
+%.unit.ar3r: %.ar3a %.ngph %.A.match2
+	cat $*.ar3a $*.ngph | $(BIN)/slide-and-overlay2.py -A $*.A.match2 9.39 -9.39 0 9.39 9.39 0 0 0 7.38 > $@
+#原子の散布図を、グリッド上の濃度分布に変換
+#ずらし量を指定しているが、この量はあとのclustersの結果をもとに
+#目分量で決めた。
+%.unit.avg.grid: %.unit.ar3r #untitled: #generate an average molecular positions from unit.ar3r.  Manual work.
+	$(BIN)/ar3r2grid.py -0.30 -0.8 -0.090033222591 < $< > $@
+#空間分布を等高面で可視化する。
+#セル内相対座標なので、画面上では立方体として表示されているが、実際は縦にもっとつぶれている。
+#それと、どうも10001番は単位胞の角の分子ではなかったらしいことがわかる。
+#ずらす必要があるようだ。
+%.unit.avg.grid.yap: %.unit.avg.grid
+	cat $< | $(BIN)/gridpbc | $(BIN)/griddoubler | $(BIN)/contour -Y 10 > $@
+#グリッド上で連結なクラスターに分類し、上の等高面図にいくつの塊があるかを調べる。
+#クラスターのx,y,z座標、クラスターに含まれる積算分子数、クラスターに含まれるグリッドの個数。
+#クラスターは72個見付かる。単位格子は72分子と思って良いのだろうか。
+%.unit.avg.grid.clusters: %.unit.avg.grid
+	$(BIN)/grid-cluster.py < $< > $@
+#.....よくわからない。やはり、先に回転対称性をつめておく必要があるのだな。
+#単位胞の角に必ず原子が存在するとは限らない(例えば氷16のように)
+#結局前回同様の作業が必要なのか?
