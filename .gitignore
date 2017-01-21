@@ -1,4 +1,4 @@
-00060*
+*~
 bin_from_Freezing_Pressure/*
 .yapviewstack
 Freezing_IceVII
@@ -14,7 +14,7 @@ bin/slide-and-match2
 *.mod
 
 *.o
-
+log
 src/SlideAndOverlay/slide-and-match
 
 src/SlideAndOverlay/slide-and-match2

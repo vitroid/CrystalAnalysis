@@ -17,14 +17,13 @@ def LoadAR3A(file):
 
 
 
-div = 20
-
 import sys
 grid = dict()
 file = sys.stdin
+div = int(sys.argv[1])
 shift = numpy.zeros(3)
-if len(sys.argv) > 1:
-    shift = numpy.array([float(x) for x in sys.argv[1:4]])
+if len(sys.argv) > 2:
+    shift = numpy.array([float(x) for x in sys.argv[2:5]])
 natom = 0
 while True:
     line = file.readline()
@@ -49,5 +48,3 @@ for i in range(div):
         for k in range(div):
             print grid.get((i,j,k),0) / avgdens
 
-
-                
