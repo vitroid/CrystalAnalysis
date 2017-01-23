@@ -66,10 +66,10 @@ all:
 #どこまでマッチングするか(並進だけか、回転や鏡映を含めるか)は、
 #試行錯誤で決めざるをえない。(完全に自動化できる手順が発見できればそうするが)
 %.analysis2:
-	for x in A B C D E F; do echo $*.$$x.ar3a; done | xargs make -j 8 -k
-	for x in A B C D E F; do echo $*.$$x.match2; done | xargs make -j 8 -k
-	for x in A B C D E F; do echo $*.$$x.match2.thres30.yap; done | xargs make -j 8 -k
-	for x in A B C D E F; do echo $*.$$x.match2.thres50.yap; done | xargs make -j 8 -k
+	for x in A Ax B C D E F; do echo $*.$$x.ar3a; done | xargs make -j 8 -k
+	for x in A Ax B C D E F; do echo $*.$$x.match2; done | xargs make -j 8 -k
+	for x in A Ax B C D E F; do echo $*.$$x.match2.thres30.yap; done | xargs make -j 8 -k
+	for x in A Ax B C D E F; do echo $*.$$x.match2.thres50.yap; done | xargs make -j 8 -k
 
 
 
