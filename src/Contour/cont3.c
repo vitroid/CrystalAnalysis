@@ -317,7 +317,6 @@ void Cube_Next(Cube *cube,int face,int edge)
 }
 
 
-/*平成１１年１月１３日(水)何やってるのかさっぱりわからない。こんなに複雑なことが必要か？*/
 void *
 Cube_Contour(Cube *cube)
 {

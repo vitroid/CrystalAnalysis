@@ -183,7 +183,20 @@ class PBCGrid():
                         flakes[i] += np.array([10.0+x, y, z])
                     s += flakes
         return s
-                    
+
+    
+    def contour_yaplot(self, value):
+        """
+        By default, the lattice is shown in (1x1x1)
+        """
+        txt = ""
+        for poly in self.contour_surface(10):
+            txt += "p {0} ".format(len(poly))
+            for p in poly:
+                x,y,z = p / np.array(self.grid.shape)
+                txt += "{0} {1} {2} ".format(x,y,z)
+            txt += "\n"
+        return txt
 
 
 def test():
@@ -204,14 +217,11 @@ def test3():
         if "@GRID" in line:
             g = PBCGrid(file=file)
             g.double()
-            s = g.contour_surface(10)
-            for poly in s:
-                print("p {0} ".format(len(poly)), end="")
-                txt = ""
-                for p in poly:
-                    x,y,z = p
-                    txt += "{0} {1} {2} ".format(x,y,z)
-                print(txt)
+            print("@ 3")
+            print(g.contour_yaplot(10), end="")
+            g.grid = np.roll(g.grid[::-1, :, :], 1, axis=0)
+            print("@ 4")
+            print(g.contour_yaplot(10))
             sys.exit(0)
         
         
