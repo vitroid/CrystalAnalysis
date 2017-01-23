@@ -1,11 +1,11 @@
-BINTARGET	=contour gridpbc griddoubler hull2yap hull2hull 
+BINTARGET	=contour.py grid2yap.py # gridpbc griddoubler hull2yap hull2hull 
 CDEBUGFLAGS	= -g
 LDFLAGS=-lm
 
 
 all: $(BINTARGET)
-install: contour
-	install contour griddoubler gridpbc ../../bin
+install: $(BINTARGET)
+	install -m 0755 $(BINTARGET) ../../bin
 clean:
 	-rm *.o *~ contour
 
