@@ -169,7 +169,7 @@ class PBCGrid():
         return polys
                                 
         
-    def contour_surface(self, value):
+    def contour_flakes(self, value):
         s = [] #array of something.
         for x in range(self.grid.shape[0]):
             xra = np.array((x,x+1))%self.grid.shape[0]
@@ -180,17 +180,17 @@ class PBCGrid():
                     subgrid = np.array([self.grid[xx,yy,zz] for xx in xra for yy in yra for zz in zra])
                     flakes = self.contour_surface_in_a_cube(subgrid, value)
                     for i in range(len(flakes)):
-                        flakes[i] += np.array([10.0+x, y, z])
+                        flakes[i] += np.array([x, y, z])
                     s += flakes
         return s
 
     
-    def contour_yaplot(self, value):
+    def contour_yaplot(self, flakes):
         """
         By default, the lattice is shown in (1x1x1)
         """
         txt = ""
-        for poly in self.contour_surface(10):
+        for poly in flakes:
             txt += "p {0} ".format(len(poly))
             for p in poly:
                 x,y,z = p / np.array(self.grid.shape)
@@ -207,7 +207,7 @@ def test():
 def test2():
     g = PBCGrid(ngrid=(2,2,2))
     g.grid = np.array([1.,0.,0.,1.,0.,0.,0.,1.]).reshape((2,2,2))
-    s = g.contour_surface(0.3)
+    s = g.contour_flakes(0.3)
     print(s)
 
 def test3():
@@ -218,11 +218,11 @@ def test3():
             g = PBCGrid(file=file)
             g.double()
             print("@ 3")
-            print(g.contour_yaplot(10), end="")
+            print(g.contour_yaplot(g.contour_flakes(10)), end="")
             g.grid = np.roll(g.grid[::-1, :, :], 1, axis=0)
             print("@ 4")
-            print(g.contour_yaplot(10))
+            print(g.contour_yaplot(g.contour_flakes(10)))
             sys.exit(0)
         
 if __name__ == "__main__":
-    test3()
+    test()

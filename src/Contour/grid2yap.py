@@ -14,7 +14,7 @@ def main():
             g = contour.PBCGrid(file=file)
             g.double()   #make finer mesh
             print("@ 2") #white
-            print(g.contour_yaplot(10))
+            print(g.contour_yaplot(g.contour_flakes(10)))
 
         
 if __name__ == "__main__":
