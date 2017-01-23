@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
 
 import numpy as np
-
+import sys
 
 
 
 
 class PBCGrid():
-    #node ID: 0..7
-    #edge is identified by two 
-    edges = set()
-    for x in range(0,8,4):
-        for y in range(0,4,2):
-            edges.add((x+y+0, x+y+1))
-    for x in range(0,8,4):
-        for z in range(0,2,1):
-            edges.add((x+0+z, x+2+z))
-    for y in range(0,4,2):
-        for z in range(0,2,1):
-            edges.add((0+y+z, 4+y+z))
+    #vertex ID: x*4+y*2+z for x,y,z in (0,1)
+    vertices = np.array([(0.0,0.0,0.0),(0.0,0.0,1.0),(0.0,1.0,0.0),(0.0,1.0,1.0),
+                         (1.0,0.0,0.0),(1.0,0.0,1.0),(1.0,1.0,0.0),(1.0,1.0,1.0)])
+    
+    edges = [(0,4), (0,2), (0,1),
+             (1,5), (1,3), (2,3),
+             (3,7), (5,7), (6,7),
+             (2,6), (4,6), (4,5)]
 
     neibor = [[None,      [11, 3, 2], [1, 9,10]],
               [[2, 4, 5], None,       [9,10, 0]],
@@ -34,8 +30,11 @@ class PBCGrid():
               [[10, 8, 7],[3, 2, 0],  None]]
 
     
-    def __init__(self, ngrid):
-        self.grid = np.zeros(ngrid)
+    def __init__(self, ngrid=None, file=None):
+        if file is not None:
+            self.load(file)
+        elif ngrid is not None:
+            self.grid = np.zeros(ngrid)
         
     def load(self, file):
         line = file.readline()
@@ -54,46 +53,120 @@ class PBCGrid():
             s+= "{0}\n".format(x)
         return s
     
+    def doublex(self, grid):
+        """
+        double the lattice by linear interpolation
+        """
+        shape = list(grid.shape)
+        shape[0]*=2
+        newgrid = np.zeros(shape)
+        for x in range(grid.shape[0]):
+            for y in range(grid.shape[1]):
+                for z in range(grid.shape[2]):
+                    x2 = x*2
+                    newgrid[x2,y,z] = grid[x,y,z]
+                    newgrid[x2-1,y,z] = (grid[x,y,z] + grid[x-1,y,z])/2.0
+        return newgrid
+    
+
+    def doubley(self, grid):
+        """
+        double the lattice by linear interpolation
+        """
+        shape = list(grid.shape)
+        shape[1]*=2
+        newgrid = np.zeros(shape)
+        for x in range(grid.shape[0]):
+            for y in range(grid.shape[1]):
+                for z in range(grid.shape[2]):
+                    y2 = y*2
+                    newgrid[x,y2,z] = grid[x,y,z]
+                    newgrid[x,y2-1,z] = (grid[x,y,z] + grid[x,y-1,z])/2.0
+        return newgrid
+    
+
+    def doublez(self, grid):
+        """
+        double the lattice by linear interpolation
+        """
+        shape = list(grid.shape)
+        shape[2]*=2
+        newgrid = np.zeros(shape)
+        for x in range(grid.shape[0]):
+            for y in range(grid.shape[1]):
+                for z in range(grid.shape[2]):
+                    z2 = z*2
+                    newgrid[x,y,z2] = grid[x,y,z]
+                    newgrid[x,y,z2-1] = (grid[x,y,z] + grid[x,y,z-1])/2.0
+        return newgrid
+    
+
     def double(self):
         """
         double the lattice by linear interpolation
         """
-        newgrid = np.zeros(2*self.grid.shape)
-        for x in range(self.grid.shape[0]):
-            for y in range(self.grid.shape[1]):
-                for z in range(self.grid.shape[2]):
-                    x2 = x*2
-                    y2 = y*2
-                    z2 = z*2
-                    newgrid[x2,y2,z2] = self.grid[x,y,z]
-                    newgrid[x2-1,y2,z2] = (self.grid[x,y,z]+self.grid[x-1,y,z])/2.0
-                    newgrid[x2,y2-1,z2] = (self.grid[x,y,z]+self.grid[x,y-1,z])/2.0
-                    newgrid[x2,y2,z2-1] = (self.grid[x,y,z]+self.grid[x,y,z-1])/2.0
-        for x in range(self.grid.shape[0]):
-            for y in range(self.grid.shape[1]):
-                for z in range(self.grid.shape[2]):
-                    x2 = x*2
-                    y2 = y*2
-                    z2 = z*2
-                    newgrid[x2-1,y2-1,z2] = (newgrid[x2-1,y2-2,z2]+newgrid[x2-1,y2,z2])/2.0
-                    newgrid[x2-1,y2,z2-1] = (newgrid[x2-1,y2,z2-2]+newgrid[x2-1,y2,z2])/2.0
-                    newgrid[x2,y2-1,z2-1] = (newgrid[x2,y2-2,z2-1]+newgrid[x2,y2,z2-1])/2.0
-        for x in range(self.grid.shape[0]):
-            for y in range(self.grid.shape[1]):
-                for z in range(self.grid.shape[2]):
-                    x2 = x*2
-                    y2 = y*2
-                    z2 = z*2
-                    newgrid[x2-1,y2-1,z-1] = (newgrid[x2-1,y2-1,z2-2]+newgrid[x2-1,y2-1,z2])/2.0
-        self.grid = newgrid
+        self.grid = self.doublez(self.doubley(self.doublex(self.grid)))
+        
 
+    def cube_next(self, fi, edge, eorder):
+        for fj in range(3):
+            if fj != fi and self.neibor[edge][fj] is not None:
+                for nextedge in self.neibor[edge][fj]:
+                    if nextedge not in self.emark:
+                        self.emark.add(nextedge)
+                        if 0 <= self.ep[nextedge] <= 1:
+                            neworder = self.cube_next(fj,nextedge, eorder+[edge])
+                            return neworder
+        return eorder+[edge]
 
+    def cube_contour_edge_order(self):
+        eorders = []
+        for e in range(12):
+            if e not in self.emark:
+                self.emark.add(e)
+                if 0 <= self.ep[e] <= 1:
+                    for fi in range(3):
+                        edges = self.neibor[e][fi]
+                        if edges is not None:
+                            for nextedge in edges:
+                                if nextedge not in self.emark:
+                                    self.emark.add(nextedge)
+                                    if 0 <= self.ep[nextedge] <= 1:
+                                        eorders.append(self.cube_next(fi,nextedge, [e,]))
+        return eorders
+                            
+                
     def contour_surface_in_a_cube(self, cube, value):
         """
         generates the contour magically
         """
+        self.ep = []
+        self.emark = set()
+        for k in range(len(self.edges)):
+            i,j = self.edges[k]
+            if cube[i] == cube[j]:
+                if cube[i] == value:
+                    p = 0.5
+                else:
+                    p = -1
+            else:
+                p = (value - cube[i])/(cube[j] - cube[i])
+            self.ep.append(p)
+            if not (0 <= p <= 1):
+                self.emark.add(k)
                 
-                
+        edge_orders = self.cube_contour_edge_order()
+        #from edge orders to vertex positions
+        polys = []
+        for edge_order in edge_orders:
+            poly = []
+            for edge in edge_order:
+                i,j = self.edges[edge]
+                p = self.ep[edge]
+                v = self.vertices[i]*(1-p) + self.vertices[j]*p
+                poly.append(v)
+            polys.append(poly)
+        return polys
                                 
         
     def contour_surface(self, value):
@@ -104,15 +177,42 @@ class PBCGrid():
                 yra = np.array((y,y+1))%self.grid.shape[1]
                 for z in range(self.grid.shape[2]-1):
                     zra = np.array((z,z+1))%self.grid.shape[2]
-                    s += contour_surface_in_a_cube(self.grid[xra,yra,zra].reshape((8,)), value)
+                    subgrid = np.array([self.grid[xx,yy,zz] for xx in xra for yy in yra for zz in zra])
+                    flakes = self.contour_surface_in_a_cube(subgrid, value)
+                    for i in range(len(flakes)):
+                        flakes[i] += np.array([10.0+x, y, z])
+                    s += flakes
+        return s
+                    
 
 
 def test():
-    g = PBCGrid((5,5,5))
+    g = PBCGrid()
     ret = g.contour_surface_in_a_cube([1.,0.,0.,1.,0.,0.,0.,1.], 0.3)
     print(ret)
 
-    
+def test2():
+    g = PBCGrid(ngrid=(2,2,2))
+    g.grid = np.array([1.,0.,0.,1.,0.,0.,0.,1.]).reshape((2,2,2))
+    s = g.contour_surface(0.3)
+    print(s)
+
+def test3():
+    file = open("00010-last.unit.avg.grid")
+    while True:
+        line = file.readline()
+        if "@GRID" in line:
+            g = PBCGrid(file=file)
+            g.double()
+            s = g.contour_surface(10)
+            for poly in s:
+                print("p {0} ".format(len(poly)), end="")
+                txt = ""
+                for p in poly:
+                    x,y,z = p
+                    txt += "{0} {1} {2} ".format(x,y,z)
+                print(txt)
+            sys.exit(0)
         
         
-test()
+test3()
