@@ -8,6 +8,15 @@ import contour
 
 
 
+def yap_xplane_at(x):
+    return "p 4 {0} 0 0 {0} 1 0 {0} 1 1 {0} 0 1".format(x)
+
+
+def yap_yplane_at(y):
+    return "p 4 0 {0} 0 0 {0} 1 1 {0} 1 1 {0} 0".format(y)
+
+
+
 def main():
     logger = logging.getLogger()
     debug=True
@@ -37,6 +46,70 @@ def main():
     #対称操作を行ってから原点をずらす方が精密な照合ができる．
     #後者を行う場合には，表現方法を工夫する必要がある．
         
+    #7 glide reflection
+    #There many possible ways....
+    #7-2 translate in z/2 and reflect in y
+    reflected = contour.PBCGrid()
+    reflected.grid = g.grid[:, ::-1,: ]
+    for sy in range(ny):
+        shifted = contour.PBCGrid()
+        shifted.grid =  np.roll(np.roll(g.grid, sy, axis=1), nz//2, axis=2)
+        score = np.sum(shifted.grid*reflected.grid) /maxscore
+        if score > 0.7:
+            cy = (ny-1-sy)/2.0
+            msg = "7glidez/2:y {0} {1}".format(cy, score)
+            logger.info(msg)
+            if yaplot:
+                #direct action
+                print("@ 2\nt 0 0 1.05 " + msg)
+                print(yap_yplane_at((sy+cy)/ny))
+                print("@ 0")
+                flakes = reflected.contour_flakes(10)
+                print(reflected.contour_yaplot(flakes), end="")
+                print("@ 4")
+                flakes = g.contour_flakes(10)
+                for i in range(len(flakes)):
+                    flakes[i] += np.array([0, sy, nz//2])
+                print(g.contour_yaplot(flakes))
+                #shifted expression
+                print("@ 2\nt 0 0 1.05 " + msg)
+                print("@ 0")
+                print(reflected.contour_yaplot(reflected.contour_flakes(10)), end="")
+                print("@ 3")
+                print(shifted.contour_yaplot(shifted.contour_flakes(10)))
+
+    sys.exit(0)
+            
+    #7-1 translate in z/2 and reflect in x
+    reflected = contour.PBCGrid()
+    reflected.grid = g.grid[::-1, :,: ]
+    for sx in range(nx):
+        shifted = contour.PBCGrid()
+        shifted.grid =  np.roll(np.roll(g.grid, sx, axis=0), nz//2, axis=2)
+        score = np.sum(shifted.grid*reflected.grid) /maxscore
+        if score > 0.7:
+            cx = (nx-1-sx)/2.0
+            logger.info("7glidez/2:x {0} {1}".format(cx, score))
+            if yaplot:
+                #direct action
+                print("@ 2\nt 0 0 1.05 7glidez/2:x {0} {1}".format(cx, score))
+                print(yap_xplane_at((sx+cx)/nx))
+                print("@ 0")
+                flakes = reflected.contour_flakes(10)
+                print(reflected.contour_yaplot(flakes), end="")
+                print("@ 4")
+                flakes = g.contour_flakes(10)
+                for i in range(len(flakes)):
+                    flakes[i] += np.array([sx, 0, nz//2])
+                print(g.contour_yaplot(flakes))
+                #shifted expression
+                print("@ 2\nt 0 0 1.05 7glidez/2:x {0} {1}".format(cx, score))
+                print("@ 0")
+                print(reflected.contour_yaplot(reflected.contour_flakes(10)), end="")
+                print("@ 3")
+                print(shifted.contour_yaplot(shifted.contour_flakes(10)))
+
+    sys.exit(0)
     #4 symmetric centers
     #このreflectedは，全反転したので，原点の格子点が[-1,-1,-1]に動いている．
     reflected = contour.PBCGrid()
@@ -138,25 +211,7 @@ def main():
                         print(shifted.contour_yaplot(shifted.contour_flakes(10)))
 
 
-    #7 glide reflection
-    #There many possible ways....
-    #7-1 translate in z/2 and reflect in x
-    reflected = g.grid[::-1, :,: ]
-    for sx in range(nx):
-        shifted =  np.roll(np.roll(g.grid, sx, axis=0), nz/2, axis=2)
-        score = np.sum(shifted*reflected) /maxscore
-        if score > 0.7:
-            cx = (nx-1-sx)/2.0
-            logger.info("7glidez/2:x {0} {1}".format(cx, score))
 
-    #7-2 translate in z/2 and reflect in y
-    reflected = g.grid[:, ::-1,: ]
-    for sy in range(ny):
-        shifted =  np.roll(np.roll(g.grid, sy, axis=1), nz/2, axis=2)
-        score = np.sum(shifted*reflected) /maxscore
-        if score > 0.7:
-            cy = (ny-1-sy)/2.0
-            logger.info("7glidez/2:y {0} {1}".format(cy, score))
 
     #7-11 translate in x/2 and reflect in y
     reflected = g.grid[:, ::-1,: ]
