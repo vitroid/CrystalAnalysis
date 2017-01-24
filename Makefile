@@ -139,7 +139,8 @@ all:
 #ずらし量を指定しているが、この量はあとのclustersの結果をもとに
 #原点が最も対称性が高くなるように決めた．
 %.unit.avg.grid: %.unit.ar3r Makefile #untitled: #generate an average molecular positions from unit.ar3r.  Manual work.
-	$(BIN)/ar3r2grid.py 24 0.853 0.853 0.99 < $< > $@
+#	$(BIN)/ar3r2grid.py 24 0.853 0.853 0.99 < $< > $@
+	$(BIN)/ar3r2grid.py 24 0.686 0.686 0.907 < $< > $@
 #	$(BIN)/ar3r2grid.py 24 0.936 0.936 0.99 < $< > $@
 #空間分布を等高面で可視化する。
 #セル内相対座標なので、画面上では立方体として表示されているが、実際は縦にもっとつぶれている。

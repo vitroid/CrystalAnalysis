@@ -2,11 +2,11 @@
 
 import numpy as np
 import sys
+import logging
 
 
 
-
-class PBCGrid():
+class Grid():
     #vertex ID: x*4+y*2+z for x,y,z in (0,1)
     vertices = np.array([(0.0,0.0,0.0),(0.0,0.0,1.0),(0.0,1.0,0.0),(0.0,1.0,1.0),
                          (1.0,0.0,0.0),(1.0,0.0,1.0),(1.0,1.0,0.0),(1.0,1.0,1.0)])
@@ -30,8 +30,11 @@ class PBCGrid():
               [[10, 8, 7],[3, 2, 0],  None]]
 
     
-    def __init__(self, ngrid=None, file=None):
-        if file is not None:
+    def __init__(self, grid=None, file=None, ngrid=None):
+        logger = logging.getLogger()
+        if grid is not None:
+            self.grid = grid.copy()
+        elif file is not None:
             self.load(file)
         elif ngrid is not None:
             self.grid = np.zeros(ngrid)
@@ -108,6 +111,7 @@ class PBCGrid():
         self.grid = self.doublez(self.doubley(self.doublex(self.grid)))
         
 
+class Contour(Grid):
     def cube_next(self, fi, edge, eorder):
         for fj in range(3):
             if fj != fi and self.neibor[edge][fj] is not None:
