@@ -166,3 +166,14 @@ all:
 %.symm.yap: %.grid
 	$(BIN)/symm.py < $<  > $@
 
+#分析5
+#*.clustersを作る時に、水素結合もグループ化して、どこからどこへの水素結合が一番
+#多いか統計をとりたい。つまり、slide-and-overlay2の拡張が必要ということだ。
+#第1段階として、matchした領域のすべての頂点と結合を、gridの座標で表現する
+%.A.match2.gridbond: %.ar3a %.ngph %.A.match2
+	cat $*.ar3a $*.ngph | python3 bin/clustering.py $*.A.match2 9.39 -9.39 0 9.39 9.39 0 0 0 7.38  > $@
+#上の結果を統計して表示する。
+%.gridbond.yap: %.gridbond
+	$(BIN)/bondclusters.py 9.39 -9.39 0 9.39 9.39 0 0 0 7.38       0.686 0.686 0.907 < $< > $@
+#分析6
+#分析5の結果をもとに、3Dプリンタで可視化する。
