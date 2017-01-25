@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import numpy
+import numpy as np
 
 #load a specific file type of molecular coordinate
 def LoadAR3A(file):
@@ -11,7 +11,7 @@ def LoadAR3A(file):
         line = file.readline()
         columns = line.split()
         x,y,z = map(float, columns)
-        com = numpy.array([x,y,z])
+        com = np.array([x,y,z])
         coms.append(com)
     return coms
 
@@ -21,7 +21,7 @@ import sys
 grid = dict()
 file = sys.stdin
 div = int(sys.argv[1])
-shift = numpy.zeros(3)
+shift = np.zeros(3)
 unitinfo = open(sys.argv[2])
 while True:
     line = unitinfo.readline()
@@ -46,7 +46,7 @@ while True:
             coms = LoadAR3A(file)
             for com in coms:
                 com += shift
-                com -= numpy.floor(com)
+                com -= np.floor(com)
                 i,j,k = [int(x*div) for x in com]
                 grid[(i,j,k)] = grid.get((i,j,k),0) + 1
                 natom += 1.0

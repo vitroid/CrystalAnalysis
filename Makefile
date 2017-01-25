@@ -93,7 +93,7 @@ all:
 
 #分析3###################################################################################
 %.analysis3:
-	for x in 10001r8 ; do for y in unit.ar3r unit.avg.grid unit.avg.grid.yap unit.avg.grid.clusters unit.avg.symm.yap match2.gridbond match2.gridbond.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
+	for x in 10001r8 ; do for y in ar3r avg.grid avg.grid.yap avg.grid.clusters ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
 #-------------------------------------
 #単位胞は、上のyaplotの出力から手作業で推定する。
 #推定した単位胞の基本ベクトルは、
@@ -109,28 +109,28 @@ all:
 #原点をずらしてすべて重ねあわせる。
 #Yaplotでまず重ねた図を確認
 #重なりが多すぎてまったく読めない。
-%.10001r8.unit.yap: %.ar3a %.ngph %.10001r8.match2 %.10001r8.unitinfo
+%.10001r8.yap: %.ar3a %.ngph %.10001r8.match2 %.10001r8.unitinfo
 	cat $*.ar3a $*.ngph | $(BIN)/slide-and-overlay2.py $*.10001r8.match2 $*.10001r8.unitinfo > $@
 #3-2  原点をずらしたあとの、セル内の相対座標を出力。
 #これを見ると、単位胞の中の分子数は70〜80ぐらいの幅があるようだ。
 #しかし、平均的な分布をみれば、どこが欠陥かはわかるはず。
-%.10001r8.unit.ar3r: %.ar3a %.ngph %.10001r8.match2 %.10001r8.unitinfo
+%.10001r8.ar3r: %.ar3a %.ngph %.10001r8.match2 %.10001r8.unitinfo
 	cat $*.ar3a $*.ngph | $(BIN)/slide-and-overlay2.py -A $*.10001r8.match2 $*.10001r8.unitinfo > $@
 #3-3  原子の散布図を、グリッド上の濃度分布に変換
 #ずらし量を指定しているが、この量はあとのclustersの結果をもとに
 #原点が最も対称性が高くなるように決めた．
-%.unit.avg.grid: %.unit.ar3r %.unitinfo Makefile #untitled: #generate an average molecular positions from unit.ar3r.  Manual work.
+%.avg.grid: %.ar3r %.unitinfo Makefile #untitled: #generate an average molecular positions from ar3r.
 	$(BIN)/ar3r2grid.py 24 $*.unitinfo < $< > $@
 #3-4  空間分布を等高面で可視化する。
 #セル内相対座標なので、画面上では立方体として表示されているが、実際は縦にもっとつぶれている。
 #それと、どうも10001番は単位胞の角の分子ではなかったらしいことがわかる。
 #ずらす必要があるようだ。
-%.unit.avg.grid.yap: %.unit.avg.grid
+%.avg.grid.yap: %.avg.grid
 	$(BIN)/grid2yap.py 10 < $< > $@
 #3-5  グリッド上で連結なクラスターに分類し、上の等高面図にいくつの塊があるかを調べる。
 #クラスターのx,y,z座標、クラスターに含まれる積算分子数、クラスターに含まれるグリッドの個数。
 #クラスターは72個見付かる。単位格子は72分子と思って良いのだろうか。
-%.unit.avg.grid.clusters: %.unit.avg.grid
+%.avg.grid.clusters: %.avg.grid
 	$(BIN)/grid-cluster.py < $< > $@
 #.....よくわからない。やはり、先に回転対称性をつめておく必要があるのだな。
 #単位胞の角に必ず原子が存在するとは限らない(例えば氷16のように)
@@ -146,7 +146,7 @@ all:
 #そのために，大きな結晶を全部扱うのではなく，ターゲットとする分子(たぶん10001)の周辺だけを切り出して
 #しまう．単位胞の大きさだけはわかっているので，あとの処理はぐっと単純にできるはず．
 %.analysis4:
-	for x in 10001r8 ; do for y in unit.avg.symm.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
+	for x in 10001r8 ; do for y in avg.symm.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
 #-------------------------------------
 #4-1  Assume the symmetry from the grid data.
 %.symm.yap: %.grid
@@ -158,11 +158,11 @@ all:
 
 #分析5###################################################################################
 #*.clustersを作る時に、水素結合もグループ化して、どこからどこへの水素結合が一番
-#多いか統計をとりたい。つまり、slide-and-overlay2の拡張が必要ということだ。
+#多いか統計をとりたい。
 %.analysis5:
 	for x in 10001r8 ; do for y in gridbond gridbond.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
 #-------------------------------------
-#5-1  第1段階として、matchした領域のすべての頂点と結合を、gridの座標で表現する
+#5-1  matchした領域のすべての頂点と結合を、gridの座標で表現する
 %.10001r8.gridbond: %.ar3a %.ngph %.10001r8.match2
 	cat $*.ar3a $*.ngph | python3 bin/clustering.py $*.10001r8.match2 $*.10001r8.unitinfo > $@
 #5-2  上の結果を統計して表示する。

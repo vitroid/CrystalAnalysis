@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import contour
+import grid
 import sys
 
 def main():
@@ -11,7 +11,7 @@ def main():
         if len(line) == 0:
             break
         if "@GRID" in line:
-            g = contour.PBCGrid(file=file)
+            g = grid.Contour(file=file)
             g.double()   #make finer mesh
             print("@ 2") #white
             print(g.contour_yaplot(g.contour_flakes(10)))

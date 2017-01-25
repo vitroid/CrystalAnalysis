@@ -3,8 +3,7 @@
 # slide and overlay the lattice manually.
 #slide-and-overlay.F90の出力を読みこんで、可視化する部分だけを担うことにする。
 
-import numpy
-import numpy.linalg
+import numpy as np
 import math
 import sys
 import itertools
@@ -28,10 +27,10 @@ def rint(x):
 ##################################################### Adjacency by distance and direction
 #determine whether vector points to the direction
 def IsAdjacent( vec, direc, thres ):
-    siz = numpy.linalg.norm(vec)
+    siz = np.linalg.norm(vec)
     if siz < thres:
         #distance is short enough
-        ip  = numpy.dot(vec, direc)
+        ip  = np.dot(vec, direc)
     if ip < -siz*0.95 or siz*0.95 < ip:
         #the vector directs
         return True
@@ -72,7 +71,7 @@ def LoadAR3A(file):
         line = file.readline()
         columns = line.split()
         x,y,z = map(float, columns)
-        com = numpy.array([x,y,z])
+        com = np.array([x,y,z])
         coms.append(com)
     return coms
 
@@ -91,7 +90,7 @@ def Configure(file):
         if len(columns) > 0:
             if columns[0] == "@BOX3":
                 line = file.readline()
-                box = numpy.array(map(float,line.split()))
+                box = np.array(map(float,line.split()))
             elif columns[0].find("@AR3A")==0:
                 com = LoadAR3A(file)
             elif columns[0].find("@NGPH")==0:
@@ -105,7 +104,7 @@ def rint(x):
 
 
 
-#assume xyz and box are numpy.array
+#assume xyz and box are np.array
 def pairlist_small(memb,xyz,box):
     neighborset = dict()
     for i,j in itertools.combinations(memb,2):
@@ -233,10 +232,10 @@ while True:
         #elif cols[0] == "@DSPL":
         #    shift = np.array([float(x) for x in unitinfo.readline().split()])
 
-PRE  = numpy.zeros(3)
+PRE  = np.zeros(3)
 
-MAT  = numpy.column_stack((A,B,C))
-INV  = numpy.linalg.inv(MAT)
+MAT  = np.column_stack((A,B,C))
+INV  = np.linalg.inv(MAT)
 
 com,box,network = Configure(sys.stdin)
 
@@ -279,7 +278,7 @@ for line in file:
         lines += 1
         members = set()
         coord = []
-        shift = numpy.array(columns[1:4])
+        shift = np.array(columns[1:4])
         #ice rule check
         iceruleexception = 0
         inrange = 0.
@@ -289,10 +288,10 @@ for line in file:
             pos = Wrap(xyz - shift, box)
             #posが菱面体の中に含まれれば出力する。
             #菱面体の逆変換行列で単位立方体におさめることができる。
-            relpos = numpy.dot(INV,pos)
+            relpos = np.dot(INV,pos)
             #それより、照合した8Å内を重ねるほうが正しい。
 #            if 0<relpos[0]<1 and 0<relpos[1]<1 and 0<relpos[2]<1:
-            if numpy.linalg.norm(pos) < 8.0:
+            if np.linalg.norm(pos) < 8.0:
                 unitmols.append(i)
                 inrange += 1
                 if nnei[i] != 4:
@@ -308,7 +307,7 @@ for line in file:
                 pos = Wrap(xyz - shift, box)
                 #posが菱面体の中に含まれれば出力する。
                 #菱面体の逆変換行列で単位立方体におさめることができる。
-                relpos = numpy.dot(INV,pos)
+                relpos = np.dot(INV,pos)
                 #if 0<relpos[0]<1 and 0<relpos[1]<1 and 0<relpos[2]<1:
                 #それより、照合した8Å内を重ねるほうが正しい。
                 if outputAR3R:
@@ -316,7 +315,7 @@ for line in file:
                         coord.append([relpos[0],relpos[1],relpos[2]])
                 else:
                     if -0.2<relpos[0]<1.2 and -0.2<relpos[1]<1.2 and -0.2<relpos[2]<1.2:
-                    #if numpy.linalg.norm(pos) < 12.0:
+                    #if np.linalg.norm(pos) < 12.0:
                         print "@",nnei[i]
                         print "c",pos[0],pos[1],pos[2]
                         print "@ 3"

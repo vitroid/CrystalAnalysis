@@ -89,7 +89,7 @@ def main():
     for s in range(ny+1):
         shifted = grid.Contour(grid = np.roll(g.grid, s, axis=1))
         score = np.sum(shifted.grid*rotref.grid) / maxscore
-        if score > 0.4:
+        if score > 0.7:
             #ny-1-y=y+s
             msg = "b-mirror {0} {1}".format((ny-1-s)/2.0, score)
             logger.info(msg)
