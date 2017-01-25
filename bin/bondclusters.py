@@ -153,15 +153,6 @@ for p in coms:
 print(drawbox(A,B,C), end="")
 
 #verify
-s = yp.radius(0.5)
-s += yp.palette(3)
-for p in coms:
-    if nums[p] > 100:
-        atom = (np.array(p)+coms[p]) / gridsize + shift
-        atom -= np.floor(atom)
-        atom = np.dot(atom, MAT)
-        s += yp.circle(*atom)
-print(s,end="")
 #sys.exit(0)
 
 bonds = dict()
@@ -176,13 +167,14 @@ for i in range(N):
             bonds[g] = 0
         bonds[g] += v
 
-print(yp.palette(2),end="")
+NN = dict()
+s = yp.palette(2)
 for bond in bonds:
     g1,g2 = bond
     if -group[g1] >= 100 and -group[g2] >= 100:
         r = bonds[bond]/5000
-        if r > 0.011:
-            print("r",r)
+        if bonds[bond] > 50:
+            s += yp.radius(r)
             p1 = np.array(g1) + coms[g1]
             p2 = np.array(g2) + coms[g2]
             d  = p2 - p1
@@ -193,5 +185,26 @@ for bond in bonds:
             p2 = p1 + d
             p1 = np.dot(p1,MAT)
             p2 = np.dot(p2,MAT)
-            print("s", *p1, *p2)
-            #print(g1,g2,bonds[bond])
+            s += yp.stick(*p1, *p2)
+            if bonds[bond] > 520: #thick bonds
+                if g1 not in NN:
+                    NN[g1] = 0
+                if g2 not in NN:
+                    NN[g2] = 0
+                NN[g1] += 1
+                NN[g2] += 1
+                    
+#atoms
+s += yp.radius(0.5)
+for p in coms:
+    if nums[p] > 100:
+        if NN[p] == 4:
+            s += yp.palette(3)
+        else:
+            s += yp.palette(5)
+        atom = (np.array(p)+coms[p]) / gridsize + shift
+        atom -= np.floor(atom)
+        atom = np.dot(atom, MAT)
+        s += yp.circle(*atom)
+#output and newpage
+print(s)

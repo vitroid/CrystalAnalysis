@@ -1,6 +1,10 @@
 def line(x,y,z,a,b,c):
     return "l {0} {1} {2} {3} {4} {5} \n".format(x,y,z,a,b,c)
 
+#Stick is a line with own width and arrowheads
+def stick(x,y,z,a,b,c):
+    return "s {0} {1} {2} {3} {4} {5} \n".format(x,y,z,a,b,c)
+
 def circle(x,y,z):
     return "c {0} {1} {2}\n".format(x,y,z)
 
