@@ -22,8 +22,19 @@ grid = dict()
 file = sys.stdin
 div = int(sys.argv[1])
 shift = numpy.zeros(3)
-if len(sys.argv) > 2:
-    shift = numpy.array([float(x) for x in sys.argv[2:5]])
+unitinfo = open(sys.argv[2])
+while True:
+    line = unitinfo.readline()
+    if len(line) == 0:
+        break
+    cols = line.split()
+    if len(cols) > 0:
+        #if cols[0] == "@BOX9":
+        #    A = np.array([float(x) for x in unitinfo.readline().split()])
+        #    B = np.array([float(x) for x in unitinfo.readline().split()])
+        #    C = np.array([float(x) for x in unitinfo.readline().split()])
+        if cols[0] == "@DSPL":
+            shift = np.array([float(x) for x in unitinfo.readline().split()])
 natom = 0
 while True:
     line = file.readline()

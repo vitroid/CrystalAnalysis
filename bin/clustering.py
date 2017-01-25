@@ -90,9 +90,23 @@ if debug:
 else:
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)s %(message)s")
-A = np.array([float(x) for x in sys.argv[2:5]])
-B = np.array([float(x) for x in sys.argv[5:8]])
-C = np.array([float(x) for x in sys.argv[8:11]])
+
+unitinfo = open(sys.argv[2])
+A=None
+B=None
+C=None
+while True:
+    line = unitinfo.readline()
+    if len(line) == 0:
+        break
+    cols = line.split()
+    if len(cols) > 0:
+        if cols[0] == "@BOX9":
+            A = np.array([float(x) for x in unitinfo.readline().split()])
+            B = np.array([float(x) for x in unitinfo.readline().split()])
+            C = np.array([float(x) for x in unitinfo.readline().split()])
+        #elif cols[0] == "@DSPL":
+        #    shift = np.array([float(x) for x in unitinfo.readline().split()])
 
 Threshold = 30
 NGrid = 24

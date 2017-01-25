@@ -216,10 +216,22 @@ if sys.argv[1] == "-A":
     outputAR3R = True
     del sys.argv[1]
 
-if len(sys.argv) > 2:
-    A = numpy.array([float(x) for x in sys.argv[2:5]])
-    B = numpy.array([float(x) for x in sys.argv[5:8]])
-    C = numpy.array([float(x) for x in sys.argv[8:11]])
+unitinfo = open(sys.argv[2])
+A=None
+B=None
+C=None
+while True:
+    line = unitinfo.readline()
+    if len(line) == 0:
+        break
+    cols = line.split()
+    if len(cols) > 0:
+        if cols[0] == "@BOX9":
+            A = np.array([float(x) for x in unitinfo.readline().split()])
+            B = np.array([float(x) for x in unitinfo.readline().split()])
+            C = np.array([float(x) for x in unitinfo.readline().split()])
+        #elif cols[0] == "@DSPL":
+        #    shift = np.array([float(x) for x in unitinfo.readline().split()])
 
 PRE  = numpy.zeros(3)
 
@@ -227,6 +239,7 @@ MAT  = numpy.column_stack((A,B,C))
 INV  = numpy.linalg.inv(MAT)
 
 com,box,network = Configure(sys.stdin)
+
 
 nnei = [0 for i in range(len(com))]
 for i,j in network:

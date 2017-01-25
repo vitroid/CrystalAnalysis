@@ -57,10 +57,23 @@ def drawbox(X,Y,Z):
     return t
 
 file = sys.stdin
-A = np.array([float(x) for x in sys.argv[1:4]])
-B = np.array([float(x) for x in sys.argv[4:7]])
-C = np.array([float(x) for x in sys.argv[7:10]])
-shift = np.array([float(x) for x in sys.argv[10:13]])
+unitinfo = open(sys.argv[1])
+A=None
+B=None
+C=None
+shift=None
+while True:
+    line = unitinfo.readline()
+    if len(line) == 0:
+        break
+    cols = line.split()
+    if len(cols) > 0:
+        if cols[0] == "@BOX9":
+            A = np.array([float(x) for x in unitinfo.readline().split()])
+            B = np.array([float(x) for x in unitinfo.readline().split()])
+            C = np.array([float(x) for x in unitinfo.readline().split()])
+        elif cols[0] == "@DSPL":
+            shift = np.array([float(x) for x in unitinfo.readline().split()])
 MAT  = np.array([A,B,C])
 
 NGrid = 24
