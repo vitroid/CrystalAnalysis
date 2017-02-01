@@ -20,7 +20,7 @@ def percolate(pos,grid,flag):
     ri = (i+gridsize[0]) % gridsize[0]
     rj = (j+gridsize[1]) % gridsize[1]
     rk = (k+gridsize[2]) % gridsize[2]
-    if (ri,rj,rk) in flag or not grid.has_key((ri,rj,rk)) or grid[(ri,rj,rk)] < 10:
+    if (ri,rj,rk) in flag or not grid.has_key((ri,rj,rk)) or grid[(ri,rj,rk)] < 1:
         return []
     else:
         flag.add((ri,rj,rk))

@@ -216,6 +216,8 @@ if sys.argv[1] == "-A":
     del sys.argv[1]
 
 unitinfo = open(sys.argv[2])
+threshold = float(sys.argv[3])
+
 A=None
 B=None
 C=None
@@ -273,7 +275,7 @@ for line in file:
     columns = [float(x) for x in line.split()]
     #match2: column0=molID, column1-3=displace, column4=error
     #pickup only good scores
-    if columns[4] < 30:
+    if columns[4] < threshold:
         print "###",columns[4]
         lines += 1
         members = set()

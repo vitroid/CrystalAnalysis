@@ -39,11 +39,11 @@ def Configure_gro(file):
         logger.debug("elemname:[{0}]".format(elemname))
         logger.debug("sitenum:[{0}]".format(sitenum))
         logger.debug("position:{0}".format(xyz))
-        if elemname in ("   Ow", "   Hw"):
+        if " H" in elemname or " O" in elemname:#in ("   Ow", "   Hw"):
             water.append(xyz)
             if len(water) == 3:
-                if 100 < water[0][2] < 150:
-                    waters.append(water)
+                #if 100 < water[0][2] < 150:
+                waters.append(water)
                 logger.debug("water:{0}".format(water))
                 water = []
     line = file.readline()

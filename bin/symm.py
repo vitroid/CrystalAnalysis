@@ -41,6 +41,18 @@ def yap_overlay(g1,g2,msg,palette1=0,palette2=3):
     s += g2.contour_yaplot(g2.contour_flakes(10))
     return s
 
+
+def mirror_x(grid):
+    return np.roll(grid[::-1, :, :], 1, axis=0)
+
+def mirror_y(grid):
+    return np.roll(grid[:, ::-1, :], 1, axis=1)
+
+def mirror_z(grid):
+    return np.roll(grid[:, :, ::-1], 1, axis=2)
+
+
+
 def main():
     logger = logging.getLogger()
     debug=True
@@ -77,7 +89,7 @@ def main():
     for s in range(nx+1):
         shifted = grid.Contour(grid = np.roll(g.grid, s, axis=0))
         score = np.sum(shifted.grid*rotref.grid) / maxscore
-        if score > 0.7:
+        if score > 0.6:
             #nx-1-x=x+s
             msg = "a-mirror {0} {1}".format((nx-1-s)/2.0, score)
             logger.info(msg)
@@ -89,7 +101,7 @@ def main():
     for s in range(ny+1):
         shifted = grid.Contour(grid = np.roll(g.grid, s, axis=1))
         score = np.sum(shifted.grid*rotref.grid) / maxscore
-        if score > 0.7:
+        if score > 0.6:
             #ny-1-y=y+s
             msg = "b-mirror {0} {1}".format((ny-1-s)/2.0, score)
             logger.info(msg)
@@ -102,7 +114,7 @@ def main():
         for sz in range(nz):
             shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sy, axis=1), sz, axis=2))
             score = np.sum(shifted.grid*rotref.grid) /maxscore
-            if score > 0.7:
+            if score > 0.6:
                 cz = (nz-1-sz)/2.0
                 cy = (ny-1-sy)/2.0
                 msg = "a-rot180 {0} {1} {2}".format(cy, cz, score)
@@ -129,7 +141,7 @@ def main():
         for sz in range(nz):
             shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sx, axis=0), sz, axis=2))
             score = np.sum(shifted.grid*rotref.grid) /maxscore
-            if score > 0.7:
+            if score > 0.6:
                 cz = (nz-1-sz)/2.0
                 cx = (nx-1-sx)/2.0
                 msg = "b-rot180 {0} {1} {2}".format(cx, cz, score)
@@ -156,7 +168,7 @@ def main():
         for sy in range(ny+1):
             shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1))
             score = np.sum(shifted.grid*rotref.grid) /maxscore
-            if score > 0.7:
+            if score > 0.6:
                 #nx-1-x=x+sx
                 cx = (nx-1-sx)/2.0
                 cy = (ny-1-sy)/2.0
@@ -185,7 +197,7 @@ def main():
     for sz in range(nz):
         shifted = grid.Contour(grid =  np.roll(np.roll(np.roll(g.grid, sz, axis=2), ny//2, axis=1), nx//2, axis=0))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cz = (nz-1-sz)/2.0
             msg = "n-glide_ab|c {0} {1}".format(cz, score)
             logger.info(msg)
@@ -211,7 +223,7 @@ def main():
     for sy in range(ny):
         shifted = grid.Contour(grid = np.roll(np.roll(g.grid, sy, axis=1), nx//2, axis=0))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cy = (ny-1-sy)/2.0
             msg = "a-glide|b {0} {1}".format(cy, score)
             logger.info(msg)
@@ -236,7 +248,7 @@ def main():
     for sz in range(nz):
         shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sz, axis=2), nx//2, axis=0))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cz = (nz-1-sz)/2.0
             msg = "a-glide|c {0} {1}".format(cz, score)
             logger.info(msg)
@@ -261,7 +273,7 @@ def main():
     for sz in range(nz):
         shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sz, axis=2), ny//2, axis=1))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cz = (nz-1-sz)/2.0
             msg = "b-glide|c {0} {1}".format(cz, score)
             logger.info(msg)
@@ -286,7 +298,7 @@ def main():
     for sx in range(nx):
         shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sx, axis=0), ny//2, axis=1))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cx = (nx-1-sx)/2.0
             msg = "b-glide|a {0} {1}".format(cx, score)
             logger.info(msg)
@@ -313,7 +325,7 @@ def main():
     for sy in range(ny):
         shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sy, axis=1), nz//2, axis=2))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cy = (ny-1-sy)/2.0
             msg = "c-glide|b {0} {1}".format(cy, score)
             logger.info(msg)
@@ -338,7 +350,7 @@ def main():
     for sx in range(nx):
         shifted = grid.Contour(grid =  np.roll(np.roll(g.grid, sx, axis=0), nz//2, axis=2))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             cx = (nx-1-sx)/2.0
             msg = "c-glide|a {0} {1}".format(cx, score)
             logger.info(msg)
@@ -367,7 +379,7 @@ def main():
             for sz in range(-1,nz+1):
                 shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
                 score = np.sum(shifted.grid*rotref.grid) /maxscore
-                if score > 0.7:
+                if score > 0.6:
                     #不動点が回転中心，のはず
                     cx,cy,cz = (nx-1-sx)/2.0, (ny-1-sy)/2.0, (nz-1-sz)/2
                     msg = "center {0} {1} {2} {3}".format(cx,cy,cz,score)
@@ -401,7 +413,7 @@ def main():
                 sz = nz*iz//4
                 shifted = grid.Contour(grid =  np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
                 score = np.sum(shifted.grid*rotref.grid) /maxscore
-                if score > 0.7:
+                if score > 0.6:
                     #この場合，回転とshiftの結果の不動点が回転中心なのだが，それはどこか．
                     #It seems to be wrong.
                     cx = (nx-1-sx-sy)/2.0 #Right
@@ -434,7 +446,7 @@ def main():
             for sz in range(nz):
                 shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
                 score = np.sum(shifted.grid*g.grid) / maxscore
-                if score > 0.7:
+                if score > 0.6:
                     msg = "trans {0} {1} {2} {3}".format(sx,sy,sz, score)
                     logger.info(msg)
                     if yaplot:
@@ -443,7 +455,6 @@ def main():
                         s += yap_text(0,0,1.05,msg)
                         s += yap_palette(0)
                         s += g.contour_yaplot(g.contour_flakes(10))
-                        s += g.contour_yaplot(flakes)
                         s += yap_palette(4)
                         flakes = g.contour_flakes(10)
                         for i in range(len(flakes)):
@@ -455,6 +466,60 @@ def main():
 
 
 
+    #8-1 diagonal rotation 120 degree
+    #原点は動かない．
+    for sx in range(nx):
+        for sy in range(ny):
+            for sz in range(nz):
+                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                #rotation after shift (because it is too confusing for me)
+                rotref = grid.Contour(grid = np.transpose(shifted.grid, (1,2,0)))
+                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                if score > 0.5:
+                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    logger.info(msg)
+
+    for sx in range(nx):
+        for sy in range(ny):
+            for sz in range(nz):
+                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                #rotation after shift (because it is too confusing for me)
+                r = mirror_x(shifted.grid)
+                r = np.transpose(r, (1,2,0))
+                r = mirror_x(r)
+                rotref = grid.Contour(grid = r)
+                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                if score > 0.5:
+                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    logger.info(msg)
+
+    for sx in range(nx):
+        for sy in range(ny):
+            for sz in range(nz):
+                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                #rotation after shift (because it is too confusing for me)
+                r = mirror_y(shifted.grid)
+                r = np.transpose(r, (1,2,0))
+                r = mirror_y(r)
+                rotref = grid.Contour(grid = r)
+                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                if score > 0.5:
+                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    logger.info(msg)
+
+    for sx in range(nx):
+        for sy in range(ny):
+            for sz in range(nz):
+                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                #rotation after shift (because it is too confusing for me)
+                r = mirror_z(shifted.grid)
+                r = np.transpose(r, (1,2,0))
+                r = mirror_z(r)
+                rotref = grid.Contour(grid = r)
+                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                if score > 0.5:
+                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    logger.info(msg)
 
     sys.exit(0)
 
@@ -469,7 +534,7 @@ def main():
     for s in range(nx):
         shifted = grid.Contour(grid = np.roll(np.roll(g.grid, s, axis=0), -s, axis=1))
         score = np.sum(shifted.grid*rotref.grid) /maxscore
-        if score > 0.7:
+        if score > 0.6:
             msg = "ab-mirror {0} {1}".format(nx-s/2.0, score)
             logger.info(msg)
 

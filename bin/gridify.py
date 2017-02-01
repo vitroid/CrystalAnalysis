@@ -66,21 +66,22 @@ def relpos_to_grid(relpos, gridsize):
     return tuple([int(x) for x in ipos])
 
 
-def add_vertex(relpos, gridsize, vertices):
-    #assume relpos is in [0,1]
-    ipos = relpos_to_grid(relpos, gridsize)
-    if ipos not in vertices:
-        vertices[ipos] = 0
-    vertices[ipos] += 1
-
-
-def add_bond(relpos1, relpos2, gridsize, bonds):
-    ipos1 = relpos_to_grid(relpos1, gridsize)
-    ipos2 = relpos_to_grid(relpos2, gridsize)
+def add_bond(relpos1, relpos2, gridsize, bonds, gshift):
+    logger = logging.getLogger()
+    #logger.debug("gshift {0}".format(gshift))
+    #logger.debug("relpos1 {0} {1}".format(relpos1,relpos2))
+    rel1 = relpos1 + gshift
+    rel1 -= np.floor(rel1)
+    rel2 = relpos2 + gshift
+    rel2 -= np.floor(rel2)
+    ipos1 = relpos_to_grid(rel1, gridsize)
+    ipos2 = relpos_to_grid(rel2, gridsize)
     p = frozenset((ipos1,ipos2))
-    if p not in bonds:
-        bonds[p] = 0
-    bonds[p] += 1
+    #logger.debug("p {0}".format(p))
+    if len(p) == 2:
+        if p not in bonds:
+            bonds[p] = 0
+        bonds[p] += 1
 
 debug=True
 if debug:
@@ -91,7 +92,7 @@ else:
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)s %(message)s")
 
-unitinfo = open(sys.argv[2])
+unitinfo = open(sys.argv[2])  #unitinfo
 A=None
 B=None
 C=None
@@ -105,11 +106,11 @@ while True:
             A = np.array([float(x) for x in unitinfo.readline().split()])
             B = np.array([float(x) for x in unitinfo.readline().split()])
             C = np.array([float(x) for x in unitinfo.readline().split()])
-        #elif cols[0] == "@DSPL":
-        #    shift = np.array([float(x) for x in unitinfo.readline().split()])
+        elif cols[0] == "@DSPL":
+            gshift = np.array([float(x) for x in unitinfo.readline().split()])
 
-Threshold = 30
-NGrid = 24
+Threshold = float(sys.argv[3])
+NGrid = int(sys.argv[4])
 #grid for vertices
 gridsize=(NGrid,NGrid,NGrid)
 #
@@ -130,11 +131,19 @@ CL = np.linalg.norm(C)
 for xyz in com:
     xyz += PRE
 
-vertices = dict()
 bonds = dict()
+debug = False
+if debug:
+    logging.basicConfig(level=logging.DEBUG,
+                #filename='log.txt',
+            format="%(asctime)s %(levelname)s %(message)s")
+else:
+    logging.basicConfig(level=logging.INFO,
+            format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger()
 
-file = open(sys.argv[1])
+file = open(sys.argv[1])#match2
+
 count = 0
 for line in file:
     #read *.slide file
@@ -156,21 +165,19 @@ for line in file:
             b = (0<relpos[i,0]<1 and 0<relpos[i,1]<1 and 0<relpos[i,2]<1)
             if b:
                 incell.add(i)
-                add_vertex(relpos[i], gridsize, vertices)
         for i in incell:
             for j in neighbors[i]:
                 if j in incell:
-                    add_bond(relpos[i], relpos[j], gridsize, bonds)
+                    add_bond(relpos[i], relpos[j], gridsize, bonds, gshift)
                 else:
                     p = relpos[j]
                     rp = p - np.floor(p) #put in the box
-                    add_bond(relpos[i], rp, gridsize, bonds)
+                    add_bond(relpos[i], rp, gridsize, bonds, gshift)
 
 #この読みこみだけでけっこう時間がかかるので、一旦結果を出力する。
-print(len(vertices))
-for p in vertices:
-    print(*p,vertices[p])
-print(len(bonds))
+print("@GBND")
+print(NGrid,NGrid,NGrid)
 for bond in bonds:
     p1,p2 = bond
-    print(*p1,*p2,bonds[bond])
+    print(*p1,*p2,bonds[bond]/count)  #Average number of bonds in a frame
+print(-1,-1,-1,-1,-1,-1,-1)
