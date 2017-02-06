@@ -9,8 +9,6 @@ bin/slide-and-match
 
 bin/slide-and-match2
 
-@
-
 *.mod
 
 *.o
@@ -21,8 +19,11 @@ src/SlideAndOverlay/slide-and-match2
 
 0*
 q410*
+q_*
+@*
 *.png
 
 bin/contour
 
 src/Contour/contour
+submakefile.[0-9]*
