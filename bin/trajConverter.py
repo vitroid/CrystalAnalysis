@@ -76,7 +76,7 @@ def output_yaplot(mols,box,pairs):
             elif a1[0] == "H":
                 print "@ 5"
                 print "r 0.3"
-            if a1[0] in {"O", "H"}:
+            if a1[0] in ["O", "H"]:
                 d = wrap(a1[1],box)
                 print "c",d[0],d[1],d[2]
         print "y 2"
@@ -131,7 +131,7 @@ def output_pseudoPDB(mols,box,pairs,thres):
                 nh    += 1
                 name = "{0}H{1}".format(nh,nmol)
                 OHH[nh] = natom
-            if a1[0] in {"O", "H"}:
+            if a1[0] in ["O", "H"]:
                 #d = wrap(a1[1],box)
                 d = a1[1]
                 print "HETATM{0:5d}{1:>5s}{2:>5s}{3:6d}    {4:8.3f}{5:8.3f}{6:8.3f}".format(natom,name,a1[0],nmol,d[0],d[1],d[2])
@@ -169,7 +169,7 @@ def output_pseudoPDB_HB(mols,box,pairs,thres):
                 name = "{0}H{1}".format(nh,nmol)
                 OHH[nh] = natom
                 OHHord[nh] = count
-            if a1[0] in {"O", "H"}:
+            if a1[0] in ["O", "H"]:
                 d = wrap(a1[1],box)
                 print "HETATM{0:5d}{1:>5s}{2:>5s}{3:6d}    {4:8.3f}{5:8.3f}{6:8.3f}".format(natom,name,a1[0],nmol,d[0],d[1],d[2])
             count += 1

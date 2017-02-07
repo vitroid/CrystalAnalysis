@@ -17,9 +17,18 @@ for line in sys.stdin:
 
 points = np.array(points)
 #print(points.shape)
-box = np.array([40.1046, 39.2223, 36.4843])
+file = open(sys.argv[1]) #assume .ar3a file or .nx4a file
+while True:
+    line = file.readline()
+    if len(line) == 0:
+        break
+    cols = line.split()
+    if len(cols) >= 1 and cols[0] == "@BOX3":
+        line = file.readline()
+        box = np.array([float(x) for x in line.split()[:3]])
+        break
 
-pairs = pl.pairlist_fine(points, 8, box)
+pairs = pl.pairlist_fine(points, 10, box)
 for i,j,L in pairs:
     p1 = points[i]
     p2 = points[j]

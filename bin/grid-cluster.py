@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #read a grid, make cluster, and determine their positions
 
@@ -20,7 +20,7 @@ def percolate(pos,grid,flag):
     ri = (i+gridsize[0]) % gridsize[0]
     rj = (j+gridsize[1]) % gridsize[1]
     rk = (k+gridsize[2]) % gridsize[2]
-    if (ri,rj,rk) in flag or not grid.has_key((ri,rj,rk)) or grid[(ri,rj,rk)] < 1:
+    if (ri,rj,rk) in flag or (ri,rj,rk) not in grid or grid[(ri,rj,rk)] < 1:
         return []
     else:
         flag.add((ri,rj,rk))
@@ -68,4 +68,4 @@ for pos in grid:
             xs /= vs
             ys /= vs
             zs /= vs
-            print xs/gridsize[0],ys/gridsize[1],zs/gridsize[2],vs,len(points)
+            print(xs/gridsize[0],ys/gridsize[1],zs/gridsize[2],vs,len(points))

@@ -82,6 +82,7 @@ def LoadAR3A(file):
 def Configure(file):
     com = []  #default
     box = []
+    network = None
     while True:
         line = file.readline()
         if len(line) == 0:
@@ -242,10 +243,11 @@ INV  = np.linalg.inv(MAT)
 com,box,network = Configure(sys.stdin)
 
 
-nnei = [0 for i in range(len(com))]
-for i,j in network:
-    nnei[i] += 1
-#    nnei[j] += 1
+if network is not None:
+    nnei = [0 for i in range(len(com))]
+    for i,j in network:
+        nnei[i] += 1
+    #    nnei[j] += 1
 
 AL = distance(A,box)
 BL = distance(B,box)
@@ -296,7 +298,7 @@ for line in file:
             if np.linalg.norm(pos) < 8.0:
                 unitmols.append(i)
                 inrange += 1
-                if nnei[i] != 4:
+                if network is not None and nnei[i] != 4:
                     iceruleexception += 1
         ndef += iceruleexception
         print "#",iceruleexception,inrange, ndef/lines
