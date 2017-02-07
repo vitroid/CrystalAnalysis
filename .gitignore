@@ -27,3 +27,5 @@ bin/contour
 
 src/Contour/contour
 submakefile.[0-9]*
+6GPa_*
+scroll_*

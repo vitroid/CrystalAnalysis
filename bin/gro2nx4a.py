@@ -24,7 +24,7 @@ def Configure_gro(file):
     waters = []
     water = []
     for i in range(nsite):
-        logger.info("i:{0}".format(i))
+        #logger.info("i:{0}".format(i))
         line = file.readline()
         molnum = line[0:5]
         molname = line[5:10]
@@ -34,17 +34,17 @@ def Configure_gro(file):
         y = float(line[28:36])*10
         z = float(line[36:44])*10
         xyz = numpy.array([x,y,z])
-        logger.debug("molnum:[{0}]".format(molnum))
-        logger.debug("molname:[{0}]".format(molname))
-        logger.debug("elemname:[{0}]".format(elemname))
-        logger.debug("sitenum:[{0}]".format(sitenum))
-        logger.debug("position:{0}".format(xyz))
+        #logger.debug("molnum:[{0}]".format(molnum))
+        #logger.debug("molname:[{0}]".format(molname))
+        #logger.debug("elemname:[{0}]".format(elemname))
+        #logger.debug("sitenum:[{0}]".format(sitenum))
+        #logger.debug("position:{0}".format(xyz))
         if " H" in elemname or " O" in elemname:#in ("   Ow", "   Hw"):
             water.append(xyz)
             if len(water) == 3:
-                #if 100 < water[0][2] < 150:
-                waters.append(water)
-                logger.debug("water:{0}".format(water))
+                if 0 < water[0][2] < 50:
+                    waters.append(water)
+                    logger.info("water:{0} {1}".format(i,water[0][2]))
                 water = []
     line = file.readline()
     box = line.split()
