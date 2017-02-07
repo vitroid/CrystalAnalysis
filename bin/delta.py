@@ -7,13 +7,15 @@ import sys
 import numpy as np
 
 points = []
+scores = []
 for line in sys.stdin:
     cols = line.split()
     cols[0] = int(cols[0])
     for i in range(1,5):
         cols[i] = float(cols[i])
-    if cols[4] < 10:
+    if cols[4] < 15:
         points.append(cols[1:4])
+	scores.append(cols[4])
 
 points = np.array(points)
 #print(points.shape)
@@ -28,11 +30,11 @@ while True:
         box = np.array([float(x) for x in line.split()[:3]])
         break
 
-pairs = pl.pairlist_fine(points, 10, box)
+pairs = pl.pairlist_fine(points, 15, box)
 for i,j,L in pairs:
     p1 = points[i]
     p2 = points[j]
     d = p2 - p1
     d -= np.floor( d / box + 0.5 ) * box
-    print d[0],d[1],d[2], L
+    print d[0],d[1],d[2], L, scores[i]*scores[j]
 

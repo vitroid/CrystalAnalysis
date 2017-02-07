@@ -66,13 +66,13 @@ all:
 #分析2###################################################################################
 #テンプレートマッチングによる、単位胞の推定
 #並進だけ
-%.analysis2:
-	x=1005; while [ $$x -lt 4000 ]; do make submakefile.$$x; make -f submakefile.$$x $*.$${x}r8.ar3a $*.$${x}r8.match2 & x=`expr $$x + 100`; done
+#%.analysis2:
+#	x=10005; while [ $$x -lt 13000 ]; do make submakefile.$$x; make -f submakefile.$$x $*.$${x}r8.ar3a $*.$${x}r8.match2 & x=`expr $$x + 100`; done
 
 #-------------------------------------
 
 #For double matching rule, a small makefile will be generated from the template
-submakefile.%: submakefile.temp
+submakefile.%: submakefile_temp
 	sed -e 's/%%1%%/'$*'/g' $< > $@
 
 #とりあえず基準はどこでもいいので、中心付近にある14配位の分子を1つ選ぶ。
@@ -127,9 +127,9 @@ submakefile.%: submakefile.temp
 
 
 #分析3###################################################################################
-%.analysis3:
-	for x in 1005r8 1105r8 ; do make $*.$$x.analysis3; done
-	for x in 1005r8 1105r8 ; do for y in avg.grid avg.grid.yap avg.grid.clusters ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
+#%.analysis3:
+#	-for x in 12805; do make -f submakefile.$$x $*.$${x}r8.analysis3; done
+#	for x in 12805r8; do for y in avg.grid avg.grid.yap avg.grid.clusters ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
 #-------------------------------------
 #単位胞は、上のyaplotの出力から手作業で推定する。
 #推定した単位胞の基本ベクトルは、
@@ -184,7 +184,7 @@ submakefile.%: submakefile.temp
 #そのために，大きな結晶を全部扱うのではなく，ターゲットとする分子(たぶん10001)の周辺だけを切り出して
 #しまう．単位胞の大きさだけはわかっているので，あとの処理はぐっと単純にできるはず．
 %.analysis4:
-	for x in 1005r8 1105r8 ; do for y in avg.symm.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
+	for x in 12805r8; do for y in avg.symm.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
 #-------------------------------------
 #4-1  Assume the symmetry from the grid data.
 %.symm.yap: %.grid
@@ -198,8 +198,8 @@ submakefile.%: submakefile.temp
 #*.clustersを作る時に、水素結合もグループ化して、どこからどこへの水素結合が一番
 #多いか統計をとりたい。
 %.analysis5:
-	for x in 1005r8 1105r8 ; do make $*.$$x.analysis5; done
-	for x in 1005r8 1105r8 ; do for y in gridbond.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
+	for x in 12805; do make -f submakefile.$$x $*.$${x}r8.analysis5; done
+	for x in 12805r8 ; do for y in gridbond.yap ; do  echo $*.$$x.$$y; done; done | xargs make -j 8 -k
 #-------------------------------------
 #5-1  matchした領域のすべての頂点と結合を、gridの座標で表現する
 %.10001r8.gridbond: %.ar3a %.ngph %.10001r8.match2
@@ -214,3 +214,10 @@ submakefile.%: submakefile.temp
 #5-2  上の結果を統計して表示する。
 %.gridbond.scad: %.avg.grid %.gridbond %.unitinfo
 	$(BIN)/showgridbonds.py -s $*.unitinfo $*.avg.grid < $*.gridbond > $@
+
+
+include submakefile.10005
+include submakefile.10105
+include submakefile.10905
+include submakefile.11905
+include submakefile.12805

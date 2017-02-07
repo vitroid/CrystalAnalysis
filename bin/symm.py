@@ -471,10 +471,10 @@ def main():
     for sx in range(nx):
         for sy in range(ny):
             for sz in range(nz):
-                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                shifted = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2)
                 #rotation after shift (because it is too confusing for me)
-                rotref = grid.Contour(grid = np.transpose(shifted.grid, (1,2,0)))
-                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                rotref = np.transpose(shifted, (1,2,0))
+                score = np.sum(shifted*rotref) /maxscore
                 if score > 0.5:
                     msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
                     logger.info(msg)
@@ -482,43 +482,43 @@ def main():
     for sx in range(nx):
         for sy in range(ny):
             for sz in range(nz):
-                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                shifted = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2)
                 #rotation after shift (because it is too confusing for me)
-                r = mirror_x(shifted.grid)
+                r = mirror_x(shifted)
                 r = np.transpose(r, (1,2,0))
                 r = mirror_x(r)
-                rotref = grid.Contour(grid = r)
-                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                rotref = r
+                score = np.sum(shifted*rotref) /maxscore
                 if score > 0.5:
-                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    msg = "diagrot|x {0} {1} {2} {3}".format(sx,sy,sz, score)
                     logger.info(msg)
 
     for sx in range(nx):
         for sy in range(ny):
             for sz in range(nz):
-                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                shifted = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2)
                 #rotation after shift (because it is too confusing for me)
-                r = mirror_y(shifted.grid)
+                r = mirror_y(shifted)
                 r = np.transpose(r, (1,2,0))
                 r = mirror_y(r)
-                rotref = grid.Contour(grid = r)
-                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                rotref = r
+                score = np.sum(shifted*rotref) /maxscore
                 if score > 0.5:
-                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    msg = "diagrot|y {0} {1} {2} {3}".format(sx,sy,sz, score)
                     logger.info(msg)
 
     for sx in range(nx):
         for sy in range(ny):
             for sz in range(nz):
-                shifted = grid.Contour(grid = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2))
+                shifted = np.roll(np.roll(np.roll(g.grid, sx, axis=0), sy, axis=1), sz, axis=2)
                 #rotation after shift (because it is too confusing for me)
-                r = mirror_z(shifted.grid)
+                r = mirror_z(shifted)
                 r = np.transpose(r, (1,2,0))
                 r = mirror_z(r)
-                rotref = grid.Contour(grid = r)
-                score = np.sum(shifted.grid*rotref.grid) /maxscore
+                rotref = r
+                score = np.sum(shifted*rotref) /maxscore
                 if score > 0.5:
-                    msg = "diagrot {0} {1} {2} {3}".format(sx,sy,sz, score)
+                    msg = "diagrot|z {0} {1} {2} {3}".format(sx,sy,sz, score)
                     logger.info(msg)
 
     sys.exit(0)
