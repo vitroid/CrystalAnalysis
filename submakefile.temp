@@ -1,0 +1,14 @@
+BIN=bin
+%.analysis2: %.%%1%%r8.ar3a %%1%%r8.match2
+%.%%1%%r8.ar3a: %.ar3a #submakefile.%%1%%
+	python $(BIN)/maketemplate2.py 8.0 %%1%%  < $< > $@
+%.%%1%%r8.match2: %.%%1%%r8.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+
+%.analysis3: %.%%1%%r8.ar3r
+%.%%1%%r8.ar3r: %.ar3a %.ngph %.%%1%%r8.match2 %.%%1%%r8.unitinfo
+	cat $*.ar3a $*.ngph | $(BIN)/slide-and-overlay2.py -A $*.%%1%%r8.match2 $*.%%1%%r8.unitinfo > $@
+
+%.analysis5: %.%%1%%r8.gridbond
+%.%%1%%r8.gridbond: %.ar3a %.ngph %.%%1%%r8.match2
+	cat $*.ar3a $*.ngph | python3 bin/gridify.py $*.%%1%%r8.match2 $*.%%1%%r8.unitinfo 10 24 > $@

@@ -1,0 +1,18 @@
+BIN=bin
+%.%%1%%r8.analysis2: %.%%1%%r8.ar3a %.%%1%%r8.match2 %.%%1%%r8.delta
+%.%%1%%r8.ar3a: %.ar3a #submakefile.%%1%%
+	python $(BIN)/maketemplate2.py 8.0 %%1%%  < $< > $@
+%.%%1%%r8.match2: %.%%1%%r8.ar3a %.ar3a
+	$(BIN)/slide-and-match2 $^ > $@
+%.%%1%%r8.delta: %.ar3a %.%%1%%r8.match2
+	$(BIN)/delta.py $*.ar3a < $*.%%1%%r8.match2 > $@
+%.delta.yap: %.delta
+	awk '($$5<100){print "c",$$1,$$2,$$3}' $< > $@
+%.%%1%%r8.analysis3: %.%%1%%r8.ar3r %.%%1%%r8.avg.grid %.%%1%%r8.avg.grid.yap %.%%1%%r8.avg.grid.cluster
+%.%%1%%r8.ar3r: %.ar3a %.%%1%%r8.match2 %.%%1%%r8.unitinfo
+	cat $*.ar3a | $(BIN)/slide-and-overlay2.py -A $*.%%1%%r8.match2 $*.%%1%%r8.unitinfo 10 > $@
+
+%.%%1%%.analysis5: %.%%1%%r8.gridbond
+%.%%1%%r8.gridbond: %.ar3a %.ngph %.%%1%%r8.match2
+	cat $*.ar3a $*.ngph | python3 bin/gridify.py $*.%%1%%r8.match2 $*.%%1%%r8.unitinfo 10 24 > $@
+
