@@ -25,3 +25,15 @@ src/SlideAndOverlay/slide-and-match2
 bin/contour
 
 src/Contour/contour
+
+*.yap
+
+@@
+
+@@@
+
+.gitignore~
+q*
+TPPI*
+PPI*
+submakefile.[0-9]*
